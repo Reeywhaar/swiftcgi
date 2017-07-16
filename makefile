@@ -4,7 +4,4 @@ build: FORCE
 release: FORCE
 	swift build -c release && cp .build/release/App ./app.cgi
 
-watch: FORCE
-	gin --bin app.cgi
-
 FORCE:

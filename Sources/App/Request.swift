@@ -32,7 +32,7 @@ public extension Request{
 	struct Body: CustomStringConvertible{
 		let value = ({
 			() -> String? in
-			var out: [String] = [];
+			var out: [String] = []
 			var line = readLine()
 			while(line != nil){
 				out.append(line!)
@@ -40,6 +40,7 @@ public extension Request{
 			}
 			return out.count == 0 ? nil : out.joined(separator: "\n")
 		})()
+
 		public var description: String {
 			get {
 				return self.value ?? ""

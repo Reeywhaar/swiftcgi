@@ -84,7 +84,7 @@ public class Router{
 		self.routes = routes
 	}
 
-	public func withPrefix(_ prefix: String, _ routes: Route...) -> Router{
+	public func withPrefix(_ prefix: String, _ routes: Route...) -> Self{
 		for route in routes{
 			var url = prefix + route.url
 			if(url.hasSuffix("/")){
@@ -98,7 +98,7 @@ public class Router{
 		return self
 	}
 
-	public func setNotFoundHandler(_ handler: @escaping RouteHandlerDeferred){
+	public func setNotFoundHandler(_ handler: @escaping RouteHandlerDeferred) -> Self{
 		self.notFound = {
 			(request: Request) in
 			return handler(request)
@@ -108,10 +108,12 @@ public class Router{
 				return resp
 			}
 		}
+
+		return self
 	}
 
-	public func setNotFoundHandler(_ handler: @escaping RouteHandler){
-		self.setNotFoundHandler({
+	public func setNotFoundHandler(_ handler: @escaping RouteHandler) -> Self{
+		return self.setNotFoundHandler({
 			request -> Promise<Response> in
 			return PromiseKit.Promise.init(value: handler(request))
 		})

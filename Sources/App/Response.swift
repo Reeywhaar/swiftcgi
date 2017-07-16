@@ -18,23 +18,23 @@ public class Response {
 		self.contentType = contentType
 	}
 
-	class func empty() -> Response{
+	class func empty() -> Response {
 		return Response()
 	}
 
-	class func text(_ text: String) -> Response{
+	class func text(_ text: String) -> Response {
 		return Response(text, .text)
 	}
 
-	class func html(_ text: String) -> Response{
+	class func html(_ text: String) -> Response {
 		return Response(text, .html)
 	}
 
-	class func json(_ text: String) -> Response{
+	class func json(_ text: String) -> Response {
 		return Response(text, .json)
 	}
 
-	class func xml(_ text: String) -> Response{
+	class func xml(_ text: String) -> Response {
 		return Response(text, .xml)
 	}
 

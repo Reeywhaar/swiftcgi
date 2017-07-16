@@ -41,9 +41,7 @@ func getRouter() -> Router{
 				}
 			}
 		)
-	)
-
-	router.setNotFoundHandler({
+	).setNotFoundHandler({
 		request -> Response in
 		return .json("{\"error\":404}")
 	})
