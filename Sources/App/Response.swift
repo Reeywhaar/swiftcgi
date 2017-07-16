@@ -38,6 +38,11 @@ public class Response {
 		return Response(text, .xml)
 	}
 
+	func setStatus(_ status: Int) -> Self {
+		self.status = status
+		return self
+	}
+
 	func send(){
 		print("Status: \(self.status)")
 		print("Content-Type: \(self.contentType.toString())")

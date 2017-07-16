@@ -22,7 +22,7 @@ public class Server{
 			}
 			.catch{
 				error in
-				Response("\(error)").send()
+				Response("\(error)").setStatus(500).send()
 				fulfill()
 			}
 		}
