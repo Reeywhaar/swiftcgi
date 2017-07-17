@@ -82,9 +82,9 @@ func getRouter() -> Router{
 	return router
 }
 
-func spawnServer(_ router: Router, _ getRequest: (() -> Request), _ timeout: Double = 180){
+func spawnServer(_ router: Router, _ request: Request, _ timeout: Double = 180){
 	let server = Server(router: router)
-	server.serve(getRequest())
+	server.serve(request)
 	.then {
 		exit(EXIT_SUCCESS)
 	}
@@ -97,7 +97,7 @@ func spawnServer(_ router: Router, _ getRequest: (() -> Request), _ timeout: Dou
 
 func main(){
 	ServiceLocator.set(name: "Renderer", service: Renderer.init())
-	spawnServer(getRouter(), { Request() })
+	spawnServer(getRouter(), Request())
 }
 
 main()
