@@ -53,14 +53,19 @@ public class Route {
 	convenience init(
 		method: RequestMethod,
 		url: String,
-		handler: @escaping (Request) -> String
+		handler: @escaping (Request) throws -> String
 	){
 		self.init(
 			method: method,
 			url: url,
 			handler: {
 				request -> PromiseKit.Promise<String> in
-				return Promise.init(value: handler(request))
+				do {
+					let resp = try handler(request)
+					return PromiseKit.Promise.init(value: resp)
+				} catch {
+					return PromiseKit.Promise.init(error: error)
+				}
 			}
 		)
 	}
