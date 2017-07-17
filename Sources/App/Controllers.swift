@@ -5,7 +5,7 @@ extension Controllers{
 		class func index(request: Request) -> Response{
 			let context = [
 				"post": Post(
-					title: "Great Dinotopia By James Gourney",
+					title: "Dinotopia By James Gurney",
 					body: "Sample text"
 				)
 			]

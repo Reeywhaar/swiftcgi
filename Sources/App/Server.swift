@@ -6,25 +6,26 @@ public class Server{
 		self.router = router
 	}
 
-	func serve() -> Promise<Void>{
-		return Promise<Void>{
-			fulfill, reject in
-			let request = Request()
-			let response = router.getMatchedResponse(request)
-			response
-			.then() {
-				response in
-				if response.headers["Powered-By"] == nil {
-					response.headers["Powered-By"] = "VyrtsevSwift"
+	func serve(_ request: Request) -> Promise<Void>{
+		return self.router.getMatchedResponse(request).recover{
+			error -> Promise<Response> in
+			if error is RequestError{
+				switch error as! RequestError{
+					case .notFound:
+						return self.router.notFound(request);
+					default:
+						return self.router.errorHandler(request, error);
 				}
-				response.send()
-				fulfill()
+			} else {
+				return self.router.errorHandler(request, error);
 			}
-			.catch{
-				error in
-				Response("\(error)").setStatus(500).send()
-				fulfill()
+		}
+		.then() {
+			response -> Void in
+			if response.headers["Powered-By"] == nil {
+				response.headers["Powered-By"] = "VyrtsevSwift"
 			}
+			response.send()
 		}
 	}
 }

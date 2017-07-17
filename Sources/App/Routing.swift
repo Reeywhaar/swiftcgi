@@ -1,6 +1,6 @@
 import PromiseKit
 
-public typealias RouteHandler = (Request) -> Response
+public typealias RouteHandler = (Request) throws -> Response
 public typealias RouteHandlerDeferred = (Request) -> PromiseKit.Promise<Response>
 
 public class Route {
@@ -27,7 +27,12 @@ public class Route {
 		self.url = url
 		self.handler = {
 			(request: Request) in
-			return Promise.init(value: handler(request))
+			do {
+				let resp = try handler(request)
+				return Promise.init(value: resp)
+			} catch {
+				return Promise.init(error: error)
+			}
 		}
 	}
 
@@ -79,6 +84,11 @@ public class Router{
 		resp.status = 404
 		return PromiseKit.Promise.init(value: resp)
 	}
+	public var errorHandler: (Request, Error) -> PromiseKit.Promise<Response> = {
+		request, error in
+		let resp = Response.text("500 Server Error").setStatus(500)
+		return PromiseKit.Promise.init(value: resp)
+	}
 
 	public init(_ routes: Route...){
 		self.routes = routes
@@ -114,8 +124,31 @@ public class Router{
 
 	public func setNotFoundHandler(_ handler: @escaping RouteHandler) -> Self{
 		return self.setNotFoundHandler({
-			request -> Promise<Response> in
-			return PromiseKit.Promise.init(value: handler(request))
+			request -> PromiseKit.Promise<Response> in
+			do {
+				let resp = try handler(request)
+				return PromiseKit.Promise.init(value: resp)
+			} catch {
+				return PromiseKit.Promise.init(error: error)
+			}
+		})
+	}
+
+	public func setErrorHandler(
+		_ handler: @escaping (Request, Error) -> PromiseKit.Promise<Response>
+	) -> Self{
+		self.errorHandler = handler
+
+		return self
+	}
+
+	public func setErrorHandler(
+		_ handler: @escaping (Request, Error) -> Response
+	) -> Self{
+		return self.setErrorHandler({
+			(request, error) -> PromiseKit.Promise<Response> in
+			let resp = handler(request, error)
+			return Promise.init(value: resp)
 		})
 	}
 

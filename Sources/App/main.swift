@@ -15,6 +15,14 @@ func getRouter() -> Router{
 		),
 		Route(
 			method: .GET,
+			url: "/randomnumber",
+			handler: {
+				request -> String in
+				return "\(random(10))"
+			}
+		),
+		Route(
+			method: .GET,
 			url: "/samplejson",
 			handler: {
 				request -> Response in
@@ -35,9 +43,34 @@ func getRouter() -> Router{
 				return PMKAlamofire.request("http://swapi.co/api/people/")
 				.responseString()
 				.then { .json($0) }
+			}
+		),
+		Route(
+			method: .GET,
+			url: "/error",
+			handler: {
+				request -> Promise<Response> in
+				return PromiseKit.Promise.init(value: true)
+				.then {
+					(value: Bool) in
+					switch random(3){
+						case 0:
+							throw RequestError.notFound
+						case 1:
+							throw RequestError.serverError
+						default:
+							throw RequestError.unknownError
+					}
+				}
 				.recover {
-					error in
-					.text("\(error)")
+					(error) throws -> Response in
+					guard error is RequestError else { throw error }
+					switch error as! RequestError{
+						case .unknownError:
+							return Response.text("There was unknown error").setStatus(500)
+						default:
+							throw error
+					}
 				}
 			}
 		)
@@ -49,9 +82,9 @@ func getRouter() -> Router{
 	return router
 }
 
-func spawnServer(_ router: Router, _ timeout: Double = 180){
+func spawnServer(_ router: Router, _ getRequest: (() -> Request), _ timeout: Double = 180){
 	let server = Server(router: router)
-	server.serve()
+	server.serve(getRequest())
 	.then {
 		exit(EXIT_SUCCESS)
 	}
@@ -64,7 +97,7 @@ func spawnServer(_ router: Router, _ timeout: Double = 180){
 
 func main(){
 	ServiceLocator.set(name: "Renderer", service: Renderer.init())
-	spawnServer(getRouter())
+	spawnServer(getRouter(), { Request() })
 }
 
 main()

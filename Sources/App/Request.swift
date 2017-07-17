@@ -1,5 +1,11 @@
 import Foundation
 
+enum RequestError: Error{
+	case notFound
+	case serverError
+	case unknownError
+}
+
 public enum RequestMethod: String{
 	case GET = "GET"
 	case POST = "POST"

@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swiftapp",
+    name: "swiftcgi",
 	dependencies: [
 		.Package(
 			url: "https://github.com/PromiseKit/Alamofire-/",
